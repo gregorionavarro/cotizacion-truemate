@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud de Cotización · TrueMate Insurance Financial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  /* ============================================================
+     Los datos a configurar (correo y WhatsApp) estan mas abajo,
+     en la seccion "CONFIGURA AQUI" dentro del codigo JavaScript.
+     ============================================================ */
+  :root{
+    --navy:#16284e;
+    --navy-2:#1f3a6e;
+    --coral:#ec5a43;
+    --coral-dk:#d24228;
+    --ink:#1d2430;
+    --muted:#6b7480;
+    --line:#e3e7ee;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --ok:#1f9d6b;
+    --shadow:0 1px 2px rgba(22,40,78,.06), 0 8px 24px rgba(22,40,78,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.5;
+    padding-bottom:120px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+
+  /* Header / brand */
+  header{padding:34px 0 18px;text-align:center}
+  .logo{font-family:'Sora',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.5px}
+  .logo .b{color:var(--navy)}
+  .logo .o{color:var(--coral)}
+  .logo small{
+    display:block;font-family:'Inter';font-weight:600;font-size:10px;
+    letter-spacing:.42em;color:var(--muted);margin-top:4px;padding-left:.42em;
+  }
+  .lede{margin:18px auto 0;max-width:520px;color:var(--muted);font-size:15px}
+  .lede strong{color:var(--ink);font-weight:600}
+
+  /* Type toggle */
+  .toggle-wrap{margin:26px 0 10px}
+  .toggle-q{font-family:'Sora';font-weight:600;font-size:14px;color:var(--navy);margin:0 0 10px;text-align:center}
+  .seg{
+    display:flex;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:14px;padding:6px;box-shadow:var(--shadow);flex-wrap:wrap
+  }
+  .seg label{flex:1 1 30%;min-width:120px}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg span{
+    display:block;text-align:center;padding:12px 10px;border-radius:9px;
+    font-family:'Sora';font-weight:600;font-size:13.5px;color:var(--muted);
+    cursor:pointer;transition:.15s;user-select:none;border:1px solid transparent
+  }
+  .seg input:checked + span{background:var(--navy);color:#fff}
+  .seg span:hover{color:var(--navy)}
+  .seg input:checked + span:hover{color:#fff}
+  .seg input:focus-visible + span{outline:2px solid var(--coral);outline-offset:2px}
+
+  /* Cards / sections */
+  .section{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:24px 22px;margin:16px 0;box-shadow:var(--shadow);
+  }
+  .section.hidden{display:none}
+  .sec-head{display:flex;align-items:center;gap:11px;margin:0 0 6px}
+  .sec-tag{
+    font-family:'Sora';font-weight:700;font-size:11px;letter-spacing:.12em;
+    color:#fff;background:var(--coral);padding:4px 9px;border-radius:6px;text-transform:uppercase
+  }
+  .sec-tag.navy{background:var(--navy)}
+  h2{font-family:'Sora';font-weight:600;font-size:18px;margin:0;color:var(--navy)}
+  .sec-sub{color:var(--muted);font-size:13px;margin:2px 0 18px}
+
+  /* Fields */
+  .field{margin:0 0 16px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.row{grid-template-columns:1fr}}
+  label.lbl{display:block;font-weight:500;font-size:13.5px;color:var(--ink);margin:0 0 6px}
+  label.lbl .opt{color:var(--muted);font-weight:400}
+  .req{color:var(--coral)}
+  input[type=text],input[type=tel],input[type=email],input[type=number],textarea,select{
+    width:100%;font-family:'Inter';font-size:15px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;transition:.15s
+  }
+  textarea{min-height:84px;resize:vertical}
+  input:focus,textarea:focus,select:focus{
+    outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(31,58,110,.12)
+  }
+  input::placeholder,textarea::placeholder{color:#aab2bd}
+  .hint{font-size:12px;color:var(--muted);margin:5px 0 0}
+
+  /* Campo de seguimiento que aparece al responder Sí/No */
+  .reveal{
+    margin:12px 0 4px;padding:14px 14px 2px;border-left:3px solid var(--coral);
+    background:#fdf4f1;border-radius:0 10px 10px 0;animation:slide .2s ease
+  }
+  .reveal.hidden{display:none}
+  .reveal .why{font-size:12.5px;font-weight:600;color:var(--coral-dk);margin:0 0 10px}
+  @keyframes slide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.reveal{animation:none}}
+
+  /* Tarjetas de socios (repetibles) */
+  .owner-card{border:1px solid var(--line);border-radius:13px;padding:16px 16px 2px;margin:0 0 12px;background:#fbfcfe}
+  .owner-top{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+  .owner-top h3{font-family:'Sora';font-size:14px;color:var(--navy);margin:0;font-weight:600}
+  .rm{border:0;background:#eef0f3;color:var(--muted);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1;flex:0 0 auto}
+  .rm:hover{background:var(--coral);color:#fff}
+  .addbtn{background:#fff;border:1.5px dashed var(--coral);color:var(--coral-dk);font-family:'Sora';font-weight:600;font-size:13.5px;padding:12px;border-radius:11px;cursor:pointer;width:100%;transition:.15s}
+  .addbtn:hover{background:#fdf4f1}
+
+  /* Botón copiar enlace (header) */
+  .linkbtn{margin-top:15px;background:#fff;border:1px solid var(--line);color:var(--navy);
+    font-family:'Sora';font-weight:600;font-size:12.5px;padding:9px 16px;border-radius:9px;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s}
+  .linkbtn:hover{border-color:var(--navy);background:#f5f7fa}
+  .linkbtn svg{width:15px;height:15px}
+  /* Botón PDF (barra) */
+  .btn-pdf{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+  .btn-pdf:hover{background:#eef2f8}
+
+  /* Yes / No pills */
+  .yn{display:flex;gap:8px}
+  .yn label{flex:0 0 auto}
+  .yn input{position:absolute;opacity:0;pointer-events:none}
+  .yn span{
+    display:block;padding:9px 22px;border:1px solid var(--line);border-radius:9px;
+    font-weight:600;font-size:13.5px;color:var(--muted);cursor:pointer;transition:.15s
+  }
+  .yn input:checked + span{border-color:var(--navy);background:var(--navy);color:#fff}
+  .yn input:focus-visible + span{outline:2px solid var(--coral);outline-offset:2px}
+  .yn.yesno input[value="Sí"]:checked + span{background:var(--ok);border-color:var(--ok)}
+
+  /* declaraciones block */
+  .decl{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:16px}
+  .decl .di{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line)}
+  .decl .di:last-child{border-bottom:0;padding-bottom:0}
+  .decl .di:first-child{padding-top:0}
+  .decl .qt{font-size:13.5px;color:var(--ink);flex:1}
+  .decl .qt b{color:var(--coral);font-weight:600;margin-right:4px}
+
+  .owner{border-left:3px solid var(--coral);padding-left:14px;margin:0 0 8px}
+  .owner h3{font-family:'Sora';font-size:13px;color:var(--navy);margin:0 0 12px;font-weight:600}
+
+  /* Sticky submit bar */
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    padding:14px 18px;z-index:40;box-shadow:0 -6px 24px rgba(22,40,78,.07)
+  }
+  .bar-in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .bar .note{flex:1 1 100%;font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 2px;order:-1}
+  .btn{
+    flex:1 1 auto;border:0;border-radius:11px;padding:14px 18px;cursor:pointer;
+    font-family:'Sora';font-weight:600;font-size:15px;transition:.15s;
+    display:flex;align-items:center;justify-content:center;gap:9px
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-mail{background:var(--navy);color:#fff}
+  .btn-mail:hover{background:var(--navy-2)}
+  .btn-wa{background:#25D366;color:#0a3d22}
+  .btn-wa:hover{background:#1fbe5b}
+  .btn svg{width:19px;height:19px;flex:0 0 auto}
+  .btn:disabled{opacity:.6;cursor:wait}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:26px 0 8px}
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);
+    background:var(--navy);color:#fff;padding:13px 20px;border-radius:11px;
+    font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;
+    z-index:60;max-width:90vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.2)
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.ok{background:var(--ok)}
+  .toast.err{background:var(--coral-dk)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo"><span class="b">True</span><span class="o">mate</span>
+      <small>INSURANCE FINANCIAL</small>
+    </div>
+    <p class="lede">Complete sus datos para recibir una <strong>cotización personalizada</strong>. Toma menos de 5 minutos.</p>
+    <button type="button" class="linkbtn" id="copyLink">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+      Copiar enlace para compartir
+    </button>
+  </header>
+
+  <form id="quoteForm" novalidate>
+
+    <!-- Selector de tipo -->
+    <div class="toggle-wrap">
+      <p class="toggle-q">¿Qué cotización necesita?</p>
+      <div class="seg" role="radiogroup" aria-label="Tipo de cotización">
+        <label><input type="radio" name="tipo" value="General Liability" checked><span>General Liability</span></label>
+        <label><input type="radio" name="tipo" value="Workers' Compensation"><span>Workers' Comp</span></label>
+        <label><input type="radio" name="tipo" value="Ambas (GL + WC)"><span>Ambas</span></label>
+      </div>
+    </div>
+
+    <!-- DATOS DE LA EMPRESA (común) -->
+    <section class="section">
+      <div class="sec-head"><span class="sec-tag navy">Empresa</span><h2>Información de la empresa</h2></div>
+      <p class="sec-sub">Datos generales del negocio y de contacto.</p>
+
+      <div class="field">
+        <label class="lbl">Nombre o razón social completa <span class="req">*</span></label>
+        <input type="text" name="razon_social" data-q="Razón social" placeholder="Ej. ABC Construction LLC" required>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Número de identificación federal (FEIN) <span class="opt">— opcional</span></label>
+        <input type="text" name="fein" data-q="FEIN" placeholder="XX-XXXXXXX">
+        <p class="hint">Es el número que el IRS le dio a su empresa (como un Seguro Social, pero del negocio). Aparece en sus documentos de impuestos. Si tiene empleados, normalmente ya cuenta con uno.</p>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Dirección principal de las operaciones <span class="req">*</span></label>
+        <input type="text" name="direccion" data-q="Dirección de operaciones" placeholder="Calle, ciudad, estado, ZIP" required>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Su dirección postal es la misma que la de su empresa?</label>
+        <p class="hint">La dirección postal es a dónde le llega el correo y las cartas. A veces es un apartado postal (P.O. Box) diferente a donde está el negocio.</p>
+        <div class="yn yesno">
+          <label><input type="radio" name="dir_postal_igual" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="dir_postal_igual" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-postal">
+          <p class="why">Como respondió "No", indique su dirección postal:</p>
+          <input type="text" name="direccion_postal" data-q="Dirección postal (diferente)" placeholder="Calle o P.O. Box, ciudad, estado, ZIP">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="lbl">Persona de contacto — Nombre <span class="req">*</span></label>
+          <input type="text" name="contacto_nombre" data-q="Contacto · Nombre" placeholder="Nombre y apellido" required>
+        </div>
+        <div class="field">
+          <label class="lbl">Teléfono <span class="req">*</span></label>
+          <input type="tel" name="contacto_tel" data-q="Contacto · Teléfono" placeholder="(000) 000-0000" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="lbl">Correo electrónico <span class="req">*</span></label>
+        <input type="email" name="contacto_email" data-q="Contacto · Correo" placeholder="correo@ejemplo.com" required>
+      </div>
+    </section>
+
+    <!-- SOCIOS / PROPIETARIOS (común) -->
+    <section class="section" id="sec-owners">
+      <div class="sec-head"><span class="sec-tag navy">Socios</span><h2>Socios y propietarios</h2></div>
+      <p class="sec-sub">Datos de las personas dueñas de la empresa. Agregue uno por cada socio.</p>
+      <div id="ownersList"></div>
+      <button type="button" class="addbtn" id="addOwner">+ Agregar otro socio</button>
+    </section>
+
+    <!-- EMPLEADOS (común) -->
+    <section class="section" id="sec-employees">
+      <div class="sec-head"><span class="sec-tag navy">Empleados</span><h2>Empleados y nómina</h2></div>
+      <p class="sec-sub">Se refiere a empleados de planta (W2). No incluya dueños, subcontratistas ni contratistas 1099.</p>
+      <div class="field">
+        <label class="lbl">¿Su empresa tiene empleados de planta (W2)?</label>
+        <div class="yn">
+          <label><input type="radio" name="tiene_empleados" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="tiene_empleados" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-empleados">
+          <p class="why">Como respondió "Sí", indique:</p>
+          <div class="row">
+            <div class="field">
+              <label class="lbl">Número de empleados (W2)</label>
+              <input type="number" name="num_empleados" data-q="N° de empleados (W2)" min="0" placeholder="0">
+            </div>
+            <div class="field">
+              <label class="lbl">Nómina anual total (W2)</label>
+              <input type="text" name="nomina_w2" data-q="Nómina anual total (W2)" placeholder="$ 0">
+            </div>
+          </div>
+          <p class="hint">La nómina W2 es el total de sueldos que paga al año a sus empleados de planta (aproximado).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GENERAL LIABILITY -->
+    <section class="section" id="sec-gl">
+      <div class="sec-head"><span class="sec-tag">General Liability</span><h2>Detalles de responsabilidad civil</h2></div>
+      <p class="sec-sub">Información sobre la operación del negocio.</p>
+
+      <div class="field">
+        <label class="lbl">¿Tiene actualmente una póliza de General Liability?</label>
+        <div class="yn">
+          <label><input type="radio" name="gl_poliza_actual" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="gl_poliza_actual" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-poliza-gl">
+          <p class="why">Como respondió "Sí", confirme los datos de su póliza de General Liability:</p>
+          <div class="field">
+            <label class="lbl">Compañía aseguradora</label>
+            <input type="text" name="gl_poliza_empresa" data-q="GL · Aseguradora actual" placeholder="Nombre de la aseguradora">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label class="lbl">¿Cuánto tiempo lleva con ella?</label>
+              <input type="text" name="gl_poliza_tiempo" data-q="GL · Tiempo con la aseguradora" placeholder="Ej. 2 años">
+            </div>
+            <div class="field">
+              <label class="lbl">Fecha de vencimiento <span class="opt">— opcional</span></label>
+              <input type="text" name="gl_poliza_vence" data-q="GL · Vencimiento" placeholder="MM/AAAA">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Actividad principal <span class="req">*</span></label>
+        <textarea name="gl_actividad" data-q="GL · Actividad principal" placeholder="Describa detalladamente a qué se dedica su empresa"></textarea>
+        <p class="hint">Cuente con sus palabras qué hace su negocio en el día a día. Ej.: "Instalamos pisos y azulejos en casas y oficinas."</p>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Año de fundación</label>
+        <input type="number" name="gl_anio" data-q="GL · Año de fundación" placeholder="Ej. 2018" min="1900" max="2026">
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Su empresa alquila o posee algún local permanente fuera del estado?</label>
+        <p class="hint">Un "local permanente" es una oficina, bodega o tienda fija en otro estado. No cuenta un trabajo o proyecto temporal.</p>
+        <div class="yn">
+          <label><input type="radio" name="gl_local_fuera" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="gl_local_fuera" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-local">
+          <p class="why">Como respondió "Sí", díganos dónde:</p>
+          <input type="text" name="gl_local_detalle" data-q="GL · Local fuera del estado (dónde)" placeholder="Ej. Georgia — Atlanta, 123 Main St">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Ventas o ingresos del año pasado <span class="opt">— si aplica</span></label>
+        <input type="text" name="gl_ventas_pasado" data-q="GL · Ventas año pasado" placeholder="$ 0">
+        <p class="hint">Cuánto facturó su negocio en los últimos 12 meses. Un número aproximado está bien.</p>
+      </div>
+      <div class="field">
+        <label class="lbl">Ventas estimadas para los próximos 12 meses</label>
+        <input type="text" name="gl_ventas_estim" data-q="GL · Ventas estimadas 12m" placeholder="$ 0">
+        <p class="hint">Su mejor cálculo de cuánto venderá este año. Si su negocio es nuevo, ponga lo que cree que podría vender.</p>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Se ha cancelado, revocado o no renovado su seguro comercial en los últimos 3 años? <span class="opt">(salvo impago o interrupción del programa)</span></label>
+        <p class="hint">Pregunta si alguna aseguradora le quitó un seguro de negocio o decidió no renovárselo.</p>
+        <div class="yn">
+          <label><input type="radio" name="gl_cancelado" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="gl_cancelado" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-cancel">
+          <p class="why">Como respondió "Sí", explique brevemente qué pasó:</p>
+          <textarea name="gl_cancelado_motivo" data-q="GL · Motivo de cancelación" placeholder="Qué seguro era, cuándo ocurrió y por qué."></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿La empresa, sus directivos, propietarios o socios…?</label>
+        <div class="decl">
+          <div class="di">
+            <span class="qt"><b>A</b>¿Ha sido condenado por un delito grave en los últimos 5 años?</span>
+            <div class="yn"><label><input type="radio" name="gl_a" value="Sí"><span>Sí</span></label><label><input type="radio" name="gl_a" value="No"><span>No</span></label></div>
+          </div>
+          <div class="di">
+            <span class="qt"><b>B</b>¿Se ha declarado en quiebra en los últimos 3 años?</span>
+            <div class="yn"><label><input type="radio" name="gl_b" value="Sí"><span>Sí</span></label><label><input type="radio" name="gl_b" value="No"><span>No</span></label></div>
+          </div>
+          <div class="di">
+            <span class="qt"><b>C</b>¿Ha sido objeto de demandas, mediaciones o arbitrajes relacionados con la empresa?</span>
+            <div class="yn"><label><input type="radio" name="gl_c" value="Sí"><span>Sí</span></label><label><input type="radio" name="gl_c" value="No"><span>No</span></label></div>
+          </div>
+          <div class="di">
+            <span class="qt"><b>D</b>¿Conoce siniestros, accidentes o circunstancias que pudieran dar lugar a una reclamación contra esta póliza?</span>
+            <div class="yn"><label><input type="radio" name="gl_d" value="Sí"><span>Sí</span></label><label><input type="radio" name="gl_d" value="No"><span>No</span></label></div>
+          </div>
+        </div>
+        <div class="reveal hidden" id="rev-decl">
+          <p class="why">Marcó "Sí" en algún punto. Indique cuál (A, B, C o D) y explique:</p>
+          <textarea name="gl_decl_detalle" data-q="GL · Detalle declaraciones A–D" placeholder='Ej. "C) Un cliente nos demandó en 2023 por..."'></textarea>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Ha habido reclamaciones de seguros presentadas por o contra su empresa en los últimos 3 años?</label>
+        <p class="hint">Una "reclamación" es cuando alguien pidió dinero al seguro por un daño o accidente, sea a favor o en contra de su empresa.</p>
+        <div class="yn">
+          <label><input type="radio" name="gl_reclamaciones" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="gl_reclamaciones" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-recl">
+          <p class="why">Como respondió "Sí", describa la(s) reclamación(es):</p>
+          <textarea name="gl_reclam_detalle" data-q="GL · Detalle de reclamaciones" placeholder="Qué pasó, cuándo y cuánto se reclamó (aproximado)."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKERS COMP -->
+    <section class="section hidden" id="sec-wc">
+      <div class="sec-head"><span class="sec-tag">Workers' Comp</span><h2>Detalles de compensación laboral</h2></div>
+      <p class="sec-sub">Historial de pólizas y nómina de subcontratistas. Los datos de los socios se toman de la sección "Socios y propietarios".</p>
+
+      <div class="field">
+        <label class="lbl">¿Tiene actualmente una póliza de Workers' Comp?</label>
+        <div class="yn">
+          <label><input type="radio" name="wc_poliza_actual" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="wc_poliza_actual" value="No"><span>No</span></label>
+        </div>
+        <div class="reveal hidden" id="rev-poliza-wc">
+          <p class="why">Como respondió "Sí", confirme los datos de su póliza de Workers' Comp:</p>
+          <div class="field">
+            <label class="lbl">Compañía aseguradora</label>
+            <input type="text" name="wc_poliza_empresa" data-q="WC · Aseguradora actual" placeholder="Nombre de la aseguradora">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label class="lbl">¿Cuánto tiempo lleva con ella?</label>
+              <input type="text" name="wc_poliza_tiempo" data-q="WC · Tiempo con la aseguradora" placeholder="Ej. 2 años">
+            </div>
+            <div class="field">
+              <label class="lbl">Fecha de vencimiento <span class="opt">— opcional</span></label>
+              <input type="text" name="wc_poliza_vence" data-q="WC · Vencimiento" placeholder="MM/AAAA">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Su empresa ha tenido alguna vez una póliza de Workers' Compensation?</label>
+        <div class="yn">
+          <label><input type="radio" name="wc_previa" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="wc_previa" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">¿Emplea a algún trabajador fuera del estado?</label>
+        <div class="yn">
+          <label><input type="radio" name="wc_fuera" value="Sí"><span>Sí</span></label>
+          <label><input type="radio" name="wc_fuera" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Nómina prevista de subcontratistas (próximos 12 meses)</label>
+        <input type="text" name="wc_nomina" data-q="WC · Nómina subcontratistas 12m" placeholder="$ 0">
+        <p class="hint">Incluya nóminas de trabajadores en efectivo y de contratistas 1099.</p>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Ventas o ingresos del año pasado <span class="opt">— si aplica</span></label>
+        <input type="text" name="wc_ventas_pasado" data-q="WC · Ventas año pasado" placeholder="$ 0">
+        <p class="hint">Cuánto facturó su negocio en los últimos 12 meses. Aproximado está bien.</p>
+      </div>
+      <div class="field">
+        <label class="lbl">Ventas estimadas para los próximos 12 meses</label>
+        <input type="text" name="wc_ventas_estim" data-q="WC · Ventas estimadas 12m" placeholder="$ 0">
+        <p class="hint">Su mejor cálculo para este año. Si el negocio es nuevo, ponga lo que cree que podría vender.</p>
+      </div>
+    </section>
+
+  </form>
+
+  <footer>TrueMate Insurance Financial · Sus datos se usan únicamente para preparar su cotización.</footer>
+</div>
+
+<!-- Barra fija de envío -->
+<div class="bar">
+  <div class="bar-in">
+    <span class="note">Descargue el PDF o envíe su solicitud:</span>
+    <button class="btn btn-pdf" id="sendPdf" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+      Descargar PDF
+    </button>
+    <button class="btn btn-mail" id="sendMail" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      Enviar por correo
+    </button>
+    <button class="btn btn-wa" id="sendWa" type="button">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.9.9-2.7-.2-.3A8 8 0 1 1 12 20Zm4.5-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.1-.3 0-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.7.7-.9 1.6-.6 2.6.4 1.4 1.3 2.6 2.7 3.6 2 1.4 3.4 1.5 4.2 1.3.6-.1 1.4-.6 1.6-1.2.2-.5.2-1 .1-1.1l-.4-.2Z"/></svg>
+      Enviar por WhatsApp
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===========================================================
+   ▼▼▼  CONFIGURA AQUÍ  ▼▼▼
+   =========================================================== */
+
+// 1) CORREO con FormSubmit (sin cuenta, sin conectar Gmail, sin claves).
+//    Solo tu correo donde quieres recibir las cotizaciones.
+//    IMPORTANTE: la PRIMERA vez que alguien envíe, FormSubmit te manda un
+//    correo de confirmación. Ábrelo y haz clic en "Activate" una sola vez.
+const CORREO_DESTINO = "gregorio@truemategroup.com";
+
+// 2) Tu número de WhatsApp en formato internacional, SOLO dígitos (sin +, espacios ni guiones).
+//    Ejemplo EE.UU.: 18635551234
+const WHATSAPP_NUMERO = "14844569465";
+
+/* ===========================================================
+   ▲▲▲  FIN DE LA CONFIGURACIÓN  ▲▲▲
+   =========================================================== */
+
+const form = document.getElementById('quoteForm');
+const secGL = document.getElementById('sec-gl');
+const secWC = document.getElementById('sec-wc');
+const toastEl = document.getElementById('toast');
+
+function tipoSel(){ return form.querySelector('input[name=tipo]:checked').value; }
+
+function applyOnly(){
+  const showWC = tipoSel().includes("Workers") || tipoSel().includes('Ambas');
+  document.querySelectorAll('[data-only="wc"]').forEach(el=>{ el.style.display = showWC ? '' : 'none'; });
+}
+function applyTipo(){
+  const t = tipoSel();
+  secGL.classList.toggle('hidden', !(t.includes('General') || t.includes('Ambas')));
+  secWC.classList.toggle('hidden', !(t.includes("Workers") || t.includes('Ambas')));
+  applyOnly();
+}
+form.querySelectorAll('input[name=tipo]').forEach(r=>r.addEventListener('change',applyTipo));
+
+/* ---- Socios / propietarios (repetibles) ---- */
+const ownersList = document.getElementById('ownersList');
+let ownerSeq = 0;
+function ownerCard(){
+  const n = ++ownerSeq;
+  const div = document.createElement('div');
+  div.className = 'owner-card';
+  div.innerHTML = `
+    <div class="owner-top"><h3>Socio</h3><button type="button" class="rm" title="Quitar socio">&times;</button></div>
+    <div class="field">
+      <label class="lbl">Nombre completo</label>
+      <input type="text" data-f="nombre" placeholder="Nombre y apellido">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="lbl">% de propiedad</label>
+        <input type="number" data-f="pct" min="0" max="100" placeholder="0">
+      </div>
+      <div class="field">
+        <label class="lbl">Fecha de nacimiento <span class="opt">— opcional</span></label>
+        <input type="date" data-f="dob">
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Ingreso anual de este socio</label>
+      <input type="text" data-f="ingreso" placeholder="$ 0">
+      <p class="hint">Cuánto recibe esta persona al año por la empresa (aproximado).</p>
+    </div>
+    <div class="field" data-only="wc">
+      <label class="lbl">¿Incluir a esta persona en el Workers' Comp?</label>
+      <div class="yn">
+        <label><input type="radio" name="owner_inc_${n}" value="Sí"><span>Sí</span></label>
+        <label><input type="radio" name="owner_inc_${n}" value="No"><span>No</span></label>
+      </div>
+    </div>`;
+  div.querySelector('.rm').addEventListener('click', ()=>{
+    if(ownersList.querySelectorAll('.owner-card').length > 1){ div.remove(); renumberOwners(); }
+    else toast('Debe quedar al menos un socio.', 'err');
+  });
+  return div;
+}
+function renumberOwners(){
+  ownersList.querySelectorAll('.owner-card').forEach((c,i)=>{
+    c.querySelector('h3').textContent = 'Socio ' + (i+1);
+    c.querySelector('.rm').style.display = ownersList.querySelectorAll('.owner-card').length>1 ? '' : 'none';
+  });
+}
+function addOwner(){ ownersList.appendChild(ownerCard()); renumberOwners(); applyOnly(); }
+document.getElementById('addOwner').addEventListener('click', addOwner);
+addOwner(); // primer socio por defecto
+
+applyTipo();
+
+/* Campos de seguimiento que aparecen según la respuesta Sí/No */
+const refreshers = [];
+function wireReveal(radioName, triggerValues, revealId){
+  const rev = document.getElementById(revealId);
+  function upd(){
+    const c = form.querySelector(`input[name="${radioName}"]:checked`);
+    rev.classList.toggle('hidden', !(c && triggerValues.includes(c.value)));
+  }
+  form.querySelectorAll(`input[name="${radioName}"]`).forEach(r=>r.addEventListener('change',upd));
+  refreshers.push(upd); upd();
+}
+function wireAnyYes(names, revealId){
+  const rev = document.getElementById(revealId);
+  function upd(){
+    const any = names.some(n=>{const c=form.querySelector(`input[name="${n}"]:checked`);return c&&c.value==='Sí';});
+    rev.classList.toggle('hidden', !any);
+  }
+  names.forEach(n=>form.querySelectorAll(`input[name="${n}"]`).forEach(r=>r.addEventListener('change',upd)));
+  refreshers.push(upd); upd();
+}
+wireReveal('dir_postal_igual', ['No'], 'rev-postal');
+wireReveal('gl_local_fuera', ['Sí'], 'rev-local');
+wireReveal('gl_cancelado', ['Sí'], 'rev-cancel');
+wireReveal('gl_reclamaciones', ['Sí'], 'rev-recl');
+wireReveal('gl_poliza_actual', ['Sí'], 'rev-poliza-gl');
+wireReveal('wc_poliza_actual', ['Sí'], 'rev-poliza-wc');
+wireReveal('tiene_empleados', ['Sí'], 'rev-empleados');
+wireAnyYes(['gl_a','gl_b','gl_c','gl_d'], 'rev-decl');
+
+function toast(msg, type){
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show ' + (type||'');
+  setTimeout(()=>toastEl.classList.remove('show'), 4200);
+}
+
+/* Reúne los datos de cada socio en líneas legibles */
+function gatherOwners(){
+  const lines = [];
+  ownersList.querySelectorAll('.owner-card').forEach((card,i)=>{
+    const g = s => card.querySelector(s)?.value.trim() || '';
+    const nombre=g('[data-f=nombre]'), pct=g('[data-f=pct]'), dob=g('[data-f=dob]'), ing=g('[data-f=ingreso]');
+    if(!nombre && !pct && !dob && !ing) return;
+    const parts = [];
+    if(pct) parts.push(pct+'% propiedad');
+    if(dob) parts.push('Nac. '+dob);
+    if(ing) parts.push('Ingreso anual '+ing);
+    const incWrap = card.querySelector('[data-only="wc"]');
+    if(incWrap && incWrap.style.display!=='none'){
+      const inc = card.querySelector('.yn input:checked');
+      if(inc) parts.push('Incluir en WC: '+inc.value);
+    }
+    lines.push(['Socio '+(i+1)+(nombre?': '+nombre:''), parts.join(' · ')||'(sin detalles)']);
+  });
+  return lines;
+}
+
+/* Recolecta todos los datos en el orden del formulario */
+function gather(){
+  const data = [];
+  form.querySelectorAll('.section').forEach(sec=>{
+    if(sec.classList.contains('hidden')) return;
+    if(sec.id === 'sec-owners'){ gatherOwners().forEach(o=>data.push(o)); return; }
+    sec.querySelectorAll('input[data-q], textarea[data-q]').forEach(inp=>{
+      const wrap = inp.closest('[data-only]');
+      if(wrap && wrap.style.display==='none') return;
+      const rev = inp.closest('.reveal');
+      if(rev && rev.classList.contains('hidden')) return;
+      if(inp.value.trim()) data.push([inp.dataset.q, inp.value.trim()]);
+    });
+    const seen = new Set();
+    sec.querySelectorAll('.yn input:checked').forEach(r=>{
+      if(seen.has(r.name)) return; seen.add(r.name);
+      const lbl = r.closest('.field')?.querySelector('.lbl')?.textContent
+               || r.closest('.di')?.querySelector('.qt')?.textContent || r.name;
+      data.push([lbl.replace(/\s*\*$/,'').trim(), r.value]);
+    });
+  });
+  return data;
+}
+
+function validar(){
+  const reqs = [['razon_social','Razón social'],['direccion','Dirección'],
+                ['contacto_nombre','Nombre de contacto'],['contacto_tel','Teléfono'],
+                ['contacto_email','Correo']];
+  for(const [n,label] of reqs){
+    const el = form.querySelector(`[name=${n}]`);
+    if(!el.value.trim()){ el.focus(); toast('Falta: '+label, 'err'); return false; }
+  }
+  return true;
+}
+
+/* Agrupa los datos por sección (para el PDF) */
+function gatherStructured(){
+  const out = [];
+  form.querySelectorAll('.section').forEach(sec=>{
+    if(sec.classList.contains('hidden')) return;
+    const title = sec.querySelector('h2')?.textContent || '';
+    let rows = [];
+    if(sec.id === 'sec-owners'){ rows = gatherOwners(); }
+    else {
+      sec.querySelectorAll('input[data-q], textarea[data-q]').forEach(inp=>{
+        const wrap = inp.closest('[data-only]'); if(wrap && wrap.style.display==='none') return;
+        const rev = inp.closest('.reveal'); if(rev && rev.classList.contains('hidden')) return;
+        if(inp.value.trim()) rows.push([inp.dataset.q, inp.value.trim()]);
+      });
+      const seen = new Set();
+      sec.querySelectorAll('.yn input:checked').forEach(r=>{
+        if(seen.has(r.name)) return; seen.add(r.name);
+        const lbl = r.closest('.field')?.querySelector('.lbl')?.textContent
+                 || r.closest('.di')?.querySelector('.qt')?.textContent || r.name;
+        rows.push([lbl.replace(/\s*\*$/,'').trim(), r.value]);
+      });
+    }
+    if(rows.length) out.push({title, rows});
+  });
+  return out;
+}
+
+/* ---- Descargar PDF (se genera en el navegador) ---- */
+function downloadPDF(){
+  if(!validar()) return;
+  if(!window.jspdf || !window.jspdf.jsPDF){ toast('No se pudo cargar el generador de PDF. Revise su conexión.', 'err'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'letter'});
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = 46, labelW = 172;
+  const NAVY=[22,40,78], NAVY2=[31,58,110], CORAL=[236,90,67], INK=[29,36,48],
+        MUTE=[110,118,130], LINE=[228,232,239], ZEBRA=[247,249,252];
+  const fecha = new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
+  const CONTENT_TOP = 126;
+
+  function header(){
+    doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]); doc.rect(0,0,W,94,'F');
+    doc.setFillColor(CORAL[0],CORAL[1],CORAL[2]); doc.rect(0,94,W,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(23);
+    doc.setTextColor(255,255,255); doc.text('True', M, 48);
+    const tw = doc.getTextWidth('True');
+    doc.setTextColor(CORAL[0],CORAL[1],CORAL[2]); doc.text('mate', M+tw, 48);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(178,188,204);
+    doc.text('I N S U R A N C E   F I N A N C I A L', M+2, 62);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+    doc.text('SOLICITUD DE COTIZACIÓN', W-M, 44, {align:'right'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(198,206,220);
+    doc.text(tipoSel() + '    ·    ' + fecha, W-M, 62, {align:'right'});
+  }
+  function footer(){
+    const pages = doc.internal.getNumberOfPages();
+    for(let p=1;p<=pages;p++){
+      doc.setPage(p);
+      doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.line(M, H-34, W-M, H-34);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(MUTE[0],MUTE[1],MUTE[2]);
+      doc.text('TrueMate Insurance Financial', M, H-21);
+      doc.text('Generado desde el formulario web  ·  Página '+p+' de '+pages, W-M, H-21, {align:'right'});
+    }
+  }
+
+  header();
+  let y = CONTENT_TOP;
+
+  gatherStructured().forEach(sec=>{
+    if(y > H - 96){ doc.addPage(); header(); y = CONTENT_TOP; }
+    // barra de sección
+    doc.setFillColor(NAVY2[0],NAVY2[1],NAVY2[2]); doc.rect(M, y, W-2*M, 22, 'F');
+    doc.setFillColor(CORAL[0],CORAL[1],CORAL[2]); doc.rect(M, y, 4, 22, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+    doc.text(sec.title.toUpperCase(), M+14, y+15);
+    y += 22;
+
+    sec.rows.forEach(([k,v],i)=>{
+      doc.setFontSize(9.5);
+      const valLines = doc.splitTextToSize(String(v), W - 2*M - labelW - 20);
+      const keyLines = doc.splitTextToSize(String(k), labelW - 20);
+      const rowH = Math.max(keyLines.length, valLines.length)*12 + 12;
+      if(y + rowH > H - 46){ doc.addPage(); header(); y = CONTENT_TOP; }
+      if(i % 2 === 0){ doc.setFillColor(ZEBRA[0],ZEBRA[1],ZEBRA[2]); doc.rect(M, y, W-2*M, rowH, 'F'); }
+      doc.setDrawColor(LINE[0],LINE[1],LINE[2]);
+      doc.line(M+labelW, y, M+labelW, y+rowH);          // divisor vertical
+      const base = y + 15;
+      doc.setFont('helvetica','bold'); doc.setTextColor(66,74,88); doc.text(keyLines, M+12, base);
+      doc.setFont('helvetica','normal'); doc.setTextColor(INK[0],INK[1],INK[2]); doc.text(valLines, M+labelW+12, base);
+      y += rowH;
+      doc.line(M, y, W-M, y);                            // línea inferior
+    });
+    y += 18;
+  });
+
+  footer();
+  const razon = (form.razon_social.value||'cotizacion').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_') || 'cotizacion';
+  doc.save('Cotizacion_'+razon+'.pdf');
+  toast('PDF descargado ✓', 'ok');
+}
+document.getElementById('sendPdf').addEventListener('click', downloadPDF);
+
+/* ---- Copiar enlace ---- */
+function fallbackCopy(text){
+  const t=document.createElement('textarea'); t.value=text;
+  t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select();
+  try{ document.execCommand('copy'); toast('Enlace copiado ✓','ok'); }
+  catch(e){ toast('Copie el enlace desde la barra del navegador.','err'); }
+  t.remove();
+}
+document.getElementById('copyLink').addEventListener('click', ()=>{
+  const url = window.location.href;
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(url).then(()=>toast('Enlace copiado ✓','ok'), ()=>fallbackCopy(url));
+  } else { fallbackCopy(url); }
+});
+
+function buildText(){
+  const tipo = tipoSel();
+  let msg = `*NUEVA SOLICITUD DE COTIZACIÓN*\n*Tipo:* ${tipo}\n──────────────\n`;
+  gather().forEach(([k,v])=> msg += `*${k}:* ${v}\n`);
+  msg += `──────────────\nEnviado desde el formulario web de TrueMate.`;
+  return msg;
+}
+
+/* ---- WhatsApp ---- */
+document.getElementById('sendWa').addEventListener('click', ()=>{
+  if(!validar()) return;
+  if(WHATSAPP_NUMERO.includes('X')){ toast('Configura tu número de WhatsApp en el código.', 'err'); return; }
+  const url = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(buildText());
+  window.open(url, '_blank');
+});
+
+/* ---- Correo (FormSubmit) ---- */
+document.getElementById('sendMail').addEventListener('click', async (e)=>{
+  if(!validar()) return;
+  const btn = e.currentTarget;
+
+  const payload = {
+    _subject: 'Nueva cotización (' + tipoSel() + ') · ' + (form.razon_social.value || 'Sin nombre'),
+    _template: 'table',
+    _captcha: 'false',
+    name: 'Formulario TrueMate',
+    email: form.contacto_email.value || '',
+    'Tipo de cotización': tipoSel()
+  };
+  gather().forEach(([k,v])=>{ payload[k] = v; });
+
+  btn.disabled = true; const txt = btn.innerHTML; btn.innerHTML = 'Enviando…';
+  try{
+    const res = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(CORREO_DESTINO), {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'Accept':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const out = await res.json();
+    if(out.success === true || out.success === 'true'){
+      toast('¡Solicitud enviada! Le contactaremos pronto.', 'ok');
+      form.reset(); ownersList.innerHTML=''; addOwner(); applyTipo(); refreshers.forEach(f=>f());
+    } else {
+      console.log('FormSubmit', out);
+      toast('No se pudo enviar. Intente de nuevo.', 'err');
+    }
+  }catch(err){
+    console.log('FormSubmit error', err);
+    toast('Error de conexión. Intente de nuevo.', 'err');
+  }finally{ btn.disabled = false; btn.innerHTML = txt; }
+});
+</script>
+</body>
+</html>
